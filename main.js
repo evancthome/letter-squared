@@ -58,7 +58,7 @@ function generatePuzzle() {
     // Clear the word list display
     document.getElementById("word-list").innerHTML = '';
     
-    fetch('http://localhost:5000/generate')
+    fetch('http://generator.fly.dev/generate')
         .then(response => response.json())
         .then(puzzle => {
             const board = document.querySelector(".board");
@@ -196,7 +196,7 @@ function generatePuzzle() {
 
 async function validateWord(word) {
     try {
-        const response = await fetch(`http://localhost:5000/validate/${word}`);
+        const response = await fetch(`https://generator.fly.dev/validate/${word}`);
         const data = await response.json();
         return data.valid;
     } catch (error) {
