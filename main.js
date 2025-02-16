@@ -58,7 +58,7 @@ function generatePuzzle() {
     // Clear the word list display
     document.getElementById("word-list").innerHTML = '';
     
-    fetch('http://generator.fly.dev/generate')
+    fetch('https://generator.fly.dev/generate')
         .then(response => response.json())
         .then(puzzle => {
             const board = document.querySelector(".board");
