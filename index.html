@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Letterboxed</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles/animations.css">
+</head>
+<body>
+    <div class="wrapper">
+        <div class="word-info">
+            <div id="current-word">
+                <span class="word-text"></span>
+                <span class="cursor">|</span>
+            </div>
+            <div id="word-counter"></div>
+            <div id="word-list"></div>
+        </div>
+        <div class="board">
+            <svg class="line-overlay"></svg>
+            <div class="north"></div>
+            <div class="east"></div>
+            <div class="south"></div>
+            <div class="west"></div>
+            <div class="center-square"></div>
+        </div>
+        <div class="controls">
+            <div class="control-row">
+                <button class="control-button" id="enter-word">Enter</button>
+                <button class="control-button" id="undo-letter">Undo</button>
+                <button class="control-button" id="clear-board">Restart</button>
+            </div>
+            <div class="control-row">
+                <button class="control-button" id="new-puzzle">New</button>
+                <button class="control-button" id="show-rules">Rules</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="win-modal" class="modal">
+        <div class="modal-content">
+            <h2>Puzzle Complete!</h2>
+            <p>You solved the puzzle in <span id="word-count"></span>!</p>
+            <button class="control-button" id="new-puzzle-modal">New Puzzle</button>
+        </div>
+    </div>
+
+    <div id="rules-modal" class="modal">
+        <div class="modal-content">
+            <h2>How to Play</h2>
+            <p>Connect letters from different sides of the box to form words.</p>
+            <p>Rules:</p>
+            <ul style="text-align: left; color: var(--secondary-color); font-family: monospace;">
+                <li>Words must be at least 3 letters long</li>
+                <li>Consecutive letters must come from different sides</li>
+                <li>You can reuse letters</li>
+                <li>Solve the puzzle by using every letter at least once</li>
+                <li>Solve the puzzle in as few words as possible</li>
+                <li>Every puzzle has a 2 word solution</li>
+            </ul>
+            <button class="control-button" id="close-rules">Close</button>
+        </div>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>

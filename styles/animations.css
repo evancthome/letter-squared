@@ -1,0 +1,20 @@
+@keyframes drawLine {
+    from {
+        stroke-dasharray: 0, 1000;
+        stroke-dashoffset: 0;
+    }
+    to {
+        stroke-dasharray: 1000, 0;
+        stroke-dashoffset: 0;
+    }
+}
+
+.line-animate {
+    animation: drawLine 0.3s ease-out forwards;
+}
+
+/* Special handling for current word dashed lines */
+.line-animate[stroke-dasharray="4, 4"] {
+    animation: none;
+    stroke-dasharray: 4, 4;
+} 
