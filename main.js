@@ -59,11 +59,14 @@ function generatePuzzle() {
     document.getElementById("word-list").innerHTML = '';
     
     fetch('https://generator.fly.dev/generate')
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(puzzle => {
             const board = document.querySelector(".board");
-
-            console.log(puzzle);
             
             // Clear existing board
             board.innerHTML = '';
@@ -183,14 +186,15 @@ function generatePuzzle() {
                         currentLetter = selectedLetter;
                         document.querySelector("#current-word .word-text").textContent = currentWord.join("");
                     }  
-                    console.log(currentWord);
-                    console.log(currentLetter);
                     updateLines();
                 });  
             });
             
             updateWordCounter();
             updateLines();
+        })
+        .catch(error => {
+            alert('Failed to generate puzzle. Please try again later.');
         });
 }
 
@@ -200,7 +204,6 @@ async function validateWord(word) {
         const data = await response.json();
         return data.valid;
     } catch (error) {
-        console.error('Error validating word:', error);
         return false;
     }
 }
@@ -208,11 +211,9 @@ async function validateWord(word) {
 async function submitWord() {
     if (currentWord.length > 0) {
         const word = currentWord.join("");
-        console.log('Attempting to submit word:', word);
         
         // Check word length first
         if (word.length < 3) {
-            console.log('Word too short:', word);
             const currentWordEl = document.querySelector("#current-word");
             currentWordEl.classList.add("invalid");
             setTimeout(() => {
@@ -223,10 +224,8 @@ async function submitWord() {
         
         // Validate the word against dictionary
         const isValid = await validateWord(word);
-        console.log('Word validation result:', isValid);
         
         if (!isValid) {
-            console.log('Invalid word:', word);
             const currentWordEl = document.querySelector("#current-word");
             currentWordEl.classList.add("invalid");
             setTimeout(() => {
@@ -235,16 +234,10 @@ async function submitWord() {
             return;
         }
 
-        console.log('Valid word submitted:', word);
-        console.log('Current usedLetters before adding:', Array.from(usedLetters));
-        
         // Add all letters from the word to usedLetters set
         currentWord.forEach(letter => {
             usedLetters.add(letter);
-            console.log(`Added letter ${letter} to usedLetters`);
         });
-        
-        console.log('Current usedLetters after adding:', Array.from(usedLetters));
         
         // First add the word to our list
         enteredWords.push(word);
@@ -253,10 +246,8 @@ async function submitWord() {
         
         // Then check win condition
         const hasWon = checkWinCondition();
-        console.log('Win condition check result:', hasWon);
         
         if (hasWon) {
-            console.log('WINNER! Showing modal...');
             showWinModal();
         }
         
@@ -481,26 +472,17 @@ function createSVGLine(start, end, type) {
 
 function updateLines() {
     const svg = document.querySelector('.line-overlay');
-    if (!svg) {
-        console.warn('SVG overlay not found');
-        return;
-    }
+    if (!svg) return;
     
     svg.innerHTML = '';
-    
-    console.log('Current Word:', currentWord);
     
     // Draw current word lines
     if (currentWord.length > 1) {
         for (let i = 0; i < currentWord.length - 1; i++) {
-            // Remove the .active from the selector since we want any circle with the matching letter
             const startCircle = document.querySelector(`button.circle[data-letter="${currentWord[i]}"]`);
             const endCircle = document.querySelector(`button.circle[data-letter="${currentWord[i + 1]}"]`);
             
-            if (!startCircle || !endCircle) {
-                console.warn('Circle not found:', currentWord[i], currentWord[i + 1]);
-                continue;
-            }
+            if (!startCircle || !endCircle) continue;
             
             const startPos = getCirclePosition(startCircle);
             const endPos = getCirclePosition(endCircle);
@@ -515,10 +497,7 @@ function updateLines() {
         const startCircle = document.querySelector(`button.circle[data-letter="${line.start}"]`);
         const endCircle = document.querySelector(`button.circle[data-letter="${line.end}"]`);
         
-        if (!startCircle || !endCircle) {
-            console.warn('Circle not found for last word line:', line);
-            return;
-        }
+        if (!startCircle || !endCircle) return;
         
         const startPos = getCirclePosition(startCircle);
         const endPos = getCirclePosition(endCircle);
@@ -531,10 +510,7 @@ function updateLines() {
         const startCircle = document.querySelector(`button.circle[data-letter="${line.start}"]`);
         const endCircle = document.querySelector(`button.circle[data-letter="${line.end}"]`);
         
-        if (!startCircle || !endCircle) {
-            console.warn('Circle not found for previous line:', line);
-            return;
-        }
+        if (!startCircle || !endCircle) return;
         
         const startPos = getCirclePosition(startCircle);
         const endPos = getCirclePosition(endCircle);
@@ -553,41 +529,27 @@ function addResizeHandler() {
 }
 
 function checkWinCondition() {
-    console.log('Checking win condition...');
-    
     // Get all unique letters from the board
     const allLetters = new Set();
     document.querySelectorAll('.letter').forEach(letterEl => {
         const letter = letterEl.getAttribute('data-letter');
         allLetters.add(letter);
-        console.log(`Found letter on board: ${letter}`);
     });
-    
-    const allLettersArray = Array.from(allLetters);
-    const usedLettersArray = Array.from(usedLetters);
-    
-    console.log('All letters on board:', allLettersArray);
-    console.log('Used letters:', usedLettersArray);
     
     // Check if all letters have been used
     for (let letter of allLetters) {
         if (!usedLetters.has(letter)) {
-            console.log(`Missing letter: ${letter}`);
-            console.log(`Win condition failed - ${letter} not used yet`);
             return false;
         }
     }
     
-    console.log('All letters have been used! Win condition met!');
     return true;
 }
 
 function showWinModal() {
-    console.log('Showing win modal...');
     const modal = document.getElementById('win-modal');
     const wordCount = document.getElementById('word-count');
     const wordText = enteredWords.length === 1 ? 'word' : 'words';
     wordCount.textContent = `${enteredWords.length} ${wordText}`;
     modal.classList.add('show');
-    console.log('Win modal should now be visible');
 }
